@@ -290,14 +290,7 @@
   #event-active-indicator.active { display:block; }
 
   /* ── Shop button + modal ── */
-  #shop-btn {
-    position:fixed; bottom:60px; right:106px; z-index:50;
-    padding:8px 18px; font-size:11px; font-weight:800; letter-spacing:3px;
-    text-transform:uppercase; border:1px solid #ffcc44; color:#ffcc44;
-    background:rgba(8,10,20,.85); cursor:pointer; border-radius:6px;
-    transition:all .15s;
-  }
-  #shop-btn:hover { background:#ffcc44; color:#080a14; }
+  #shop-btn { display:none !important; }  /* In-run shop disabled — moved to lobby */
 
   #shop-row { display:flex; flex-direction:column; gap:8px; width:520px; max-width:90vw; margin-bottom:24px; }
   .shop-item {
@@ -324,7 +317,122 @@
   }
   #shop-close-btn:hover { background:#30a8ff; color:#080a14; }
 
-  /* ── Pause / inventory deep-view ── */
+  /* ═════════════════════════════════════════════════════════ */
+  /* LOBBY + LEVEL SELECT + META SHOP + COLLECTION + RESULTS    */
+  /* ═════════════════════════════════════════════════════════ */
+  #lobby-screen { background:radial-gradient(circle at 50% 40%, #1a0a30 0%, #080a14 70%); }
+  #lobby-top {
+    position:absolute; top:24px; left:50%; transform:translateX(-50%);
+    display:flex; gap:36px; padding:14px 36px; background:rgba(8,10,20,.7);
+    border:1px solid rgba(100,120,180,.3); border-radius:12px;
+  }
+  .lobby-stat { text-align:center; }
+  .lobby-stat-label { font-size:9px; letter-spacing:2px; color:#7a8aaa; text-transform:uppercase; }
+  .lobby-stat-val   { font-size:22px; font-weight:900; color:#e0eaff; }
+  #lobby-title {
+    font-size:72px; font-weight:900; letter-spacing:4px; text-align:center;
+    background:linear-gradient(180deg,#ff6abf,#ffcc44,#30c0ff);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 40px rgba(255,106,191,.4);
+    line-height:0.95; margin-bottom:10px;
+  }
+  #lobby-subtitle { font-size:14px; color:#aab4ce; letter-spacing:4px; text-transform:uppercase; margin-bottom:48px; }
+  #lobby-buttons { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .lobby-btn {
+    padding:14px 32px; font-size:13px; font-weight:800; letter-spacing:3px;
+    text-transform:uppercase; border:2px solid #4a5478; color:#aab4ce;
+    background:rgba(14,18,32,.85); cursor:pointer; border-radius:10px;
+    transition:all .15s;
+  }
+  .lobby-btn:hover { border-color:#30a8ff; color:#e0eaff; background:rgba(48,168,255,.15); }
+  .lobby-btn.primary { border-color:#44ee66; color:#44ee66; font-size:18px; padding:18px 56px; }
+  .lobby-btn.primary:hover { background:#44ee66; color:#080a14; }
+  .lobby-btn.small { padding:8px 18px; font-size:10px; opacity:0.6; }
+
+  /* Level select grid */
+  #level-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+    max-width:880px; margin-bottom:28px;
+  }
+  .level-card {
+    width:200px; min-height:160px; border-radius:12px; padding:16px;
+    background:rgba(14,18,32,.95); border:2px solid #2a3148; cursor:pointer;
+    transition:all .15s; display:flex; flex-direction:column;
+  }
+  .level-card:hover:not(.locked) { transform:translateY(-6px); border-color:#30a8ff; box-shadow:0 0 20px rgba(48,168,255,.3); }
+  .level-card.locked { opacity:0.45; cursor:not-allowed; background:rgba(8,10,20,.7); }
+  .level-card.cleared { border-color:#44ee66; }
+  .level-card.cleared:hover { box-shadow:0 0 22px rgba(68,238,102,.35); }
+  .level-num { font-size:11px; letter-spacing:3px; color:#556080; text-transform:uppercase; margin-bottom:6px; }
+  .level-name { font-size:14px; font-weight:800; color:#e0eaff; margin-bottom:6px; line-height:1.2; }
+  .level-desc { font-size:11px; color:#8a9abd; line-height:1.4; flex:1; margin-bottom:10px; }
+  .level-best { font-size:10px; color:#44ee66; letter-spacing:1.5px; text-transform:uppercase; }
+  .level-lock { font-size:24px; color:#556080; text-align:center; padding:20px 0; }
+
+  /* Meta shop */
+  #metashop-row {
+    display:flex; flex-direction:column; gap:8px; width:560px;
+    max-width:90vw; margin-bottom:24px;
+  }
+  .meta-item {
+    display:flex; align-items:center; padding:12px 14px;
+    background:rgba(14,18,32,.95); border:1px solid #2a3148; border-radius:8px;
+  }
+  .meta-item.maxed { border-color:#ffd040; background:rgba(40,32,8,.6); }
+  .meta-info { flex:1; }
+  .meta-name { font-size:13px; font-weight:800; color:#e0eaff; }
+  .meta-desc { font-size:11px; color:#8a9abd; margin-top:2px; }
+  .meta-level { font-size:10px; color:#556080; letter-spacing:2px; margin-right:14px; min-width:60px; text-align:center; }
+  .meta-level.maxed { color:#ffd040; font-weight:800; }
+  .meta-buy {
+    padding:9px 18px; font-size:11px; font-weight:800; letter-spacing:2px;
+    text-transform:uppercase; border:1px solid #44ee66; color:#44ee66;
+    background:transparent; cursor:pointer; border-radius:5px; min-width:120px;
+  }
+  .meta-buy:hover:not(:disabled) { background:#44ee66; color:#080a14; }
+  .meta-buy:disabled { border-color:#3a4258; color:#556080; cursor:not-allowed; }
+
+  /* Collection grid */
+  #collection-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:18px;
+    max-width:820px; margin-bottom:28px;
+  }
+  .coll-card {
+    width:180px; padding:14px; border-radius:12px;
+    background:rgba(14,18,32,.92); border:2px solid #2a3148;
+    text-align:center;
+  }
+  .coll-card.locked { filter:grayscale(1) brightness(0.4); }
+  .coll-portrait {
+    width:128px; height:128px; margin:0 auto 10px; border-radius:50%;
+    background-size:400% 200%; background-repeat:no-repeat;
+    border:3px solid #2a3148;
+  }
+  .coll-name { font-size:13px; font-weight:800; color:#e0eaff; }
+  .coll-rarity { font-size:9px; letter-spacing:2px; margin-top:3px; }
+  .coll-count { font-size:10px; color:#7a8aaa; margin-top:4px; letter-spacing:1px; }
+  .coll-card.locked .coll-name { color:#556080; }
+
+  /* Results screen */
+  #results-screen { background:radial-gradient(circle at 50% 50%, #180a30 0%, #080a14 70%); }
+  #results-title { font-size:64px; font-weight:900; letter-spacing:5px; margin-bottom:8px; }
+  #results-title.win  { color:#44ee66; text-shadow:0 0 30px rgba(68,238,102,.6); }
+  #results-title.loss { color:#e02050; text-shadow:0 0 30px rgba(224,32,80,.6); }
+  #results-sub { font-size:14px; color:#aab4ce; letter-spacing:3px; text-transform:uppercase; margin-bottom:38px; }
+  #results-stats {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px 48px;
+    margin-bottom:24px;
+  }
+  .rs-row { text-align:center; }
+  .rs-val { font-size:28px; font-weight:900; color:#e0eaff; }
+  .rs-label { font-size:10px; color:#556080; text-transform:uppercase; letter-spacing:2px; margin-top:2px; }
+  #results-reward {
+    font-size:16px; color:#44ee66; letter-spacing:2px; text-transform:uppercase;
+    margin-bottom:32px; font-weight:700;
+  }
+  #results-buttons { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+
+  /* Pause / inventory deep-view */
   #pause-content {
     display:grid; grid-template-columns:1fr 1fr; gap:16px;
     max-width:780px; margin-bottom:24px;
@@ -451,6 +559,65 @@
   <div class="modal-sub" id="pause-class-sub">Press Escape to resume.</div>
   <div id="pause-content"></div>
   <button id="pause-resume-btn">RESUME (ESC)</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- LOBBY SCREEN (main hub between runs)                                  -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="lobby-screen">
+  <div id="lobby-top">
+    <div class="lobby-stat"><div class="lobby-stat-label">Braincells</div><div class="lobby-stat-val" id="lobby-braincells">0</div></div>
+    <div class="lobby-stat"><div class="lobby-stat-label">Total Runs</div><div class="lobby-stat-val" id="lobby-runs">0</div></div>
+    <div class="lobby-stat"><div class="lobby-stat-label">Total Kills</div><div class="lobby-stat-val" id="lobby-kills">0</div></div>
+    <div class="lobby-stat"><div class="lobby-stat-label">Highest Level</div><div class="lobby-stat-val" id="lobby-highest">1</div></div>
+  </div>
+  <div id="lobby-title">BRAINROT<br>SURVIVORS</div>
+  <div id="lobby-subtitle">The Italian Internet Catastrophe</div>
+  <div id="lobby-buttons">
+    <button class="lobby-btn primary" id="lobby-play-btn">▶ PLAY</button>
+    <button class="lobby-btn" id="lobby-shop-btn">⬤ SHOP</button>
+    <button class="lobby-btn" id="lobby-collection-btn">✦ CLASSES</button>
+    <button class="lobby-btn small" id="lobby-wipe-btn">↺ WIPE</button>
+  </div>
+</div>
+
+<!-- LEVEL SELECT -->
+<div class="modal-overlay" id="levelselect-screen">
+  <div class="modal-label">Select Level</div>
+  <div class="modal-title">Pick Your Brainrot</div>
+  <div id="level-grid"></div>
+  <button class="lobby-btn" id="levelselect-back-btn">← BACK</button>
+</div>
+
+<!-- META SHOP (persistent upgrades) -->
+<div class="modal-overlay" id="metashop-screen">
+  <div class="modal-label">Permanent Shop</div>
+  <div class="modal-title">Spend Braincells. Get Permanently Stronger.</div>
+  <div class="modal-sub" id="metashop-balance">Braincells: 0</div>
+  <div id="metashop-row"></div>
+  <button class="lobby-btn" id="metashop-back-btn">← BACK</button>
+</div>
+
+<!-- COLLECTION -->
+<div class="modal-overlay" id="collection-screen">
+  <div class="modal-label">Class Collection</div>
+  <div class="modal-title" id="collection-progress">0 / 8 Collected</div>
+  <div class="modal-sub">Every class you've rolled. Locked silhouettes for the ones you haven't met yet.</div>
+  <div id="collection-grid"></div>
+  <button class="lobby-btn" id="collection-back-btn">← BACK</button>
+</div>
+
+<!-- RESULTS SCREEN (after level complete or death) -->
+<div class="modal-overlay" id="results-screen">
+  <div id="results-title">LEVEL CLEAR</div>
+  <div id="results-sub">—</div>
+  <div id="results-stats"></div>
+  <div id="results-reward"></div>
+  <div id="results-buttons">
+    <button class="lobby-btn" id="results-retry-btn">RETRY</button>
+    <button class="lobby-btn" id="results-next-btn">NEXT LEVEL ▶</button>
+    <button class="lobby-btn primary" id="results-lobby-btn">← LOBBY</button>
+  </div>
 </div>
 
 <!-- Gacha modal -->
@@ -937,8 +1104,20 @@ const CLASSES = {
 // ═══════════════════════════════════════════════════════════════════
 let G = null;
 
-function mkGame() {
+function mkGame(levelId = 1) {
+  const lvl = LEVELS[levelId] || LEVELS[1];
+  const obstacles = (OBSTACLE_SETS[lvl.obstacles] || (()=>[]))();
   return {
+    // Level config
+    levelId,
+    level: lvl,
+    arenaR: getArenaRadiusForLevel(lvl),
+    obstacles,
+    winState: null,  // null, 'won', 'lost'
+    elapsedAtWin: 0,
+    bossesKilledThisLevel: 0,
+    bossSequence: [], bossSeqIndex: 0,
+
     // Class
     classId: null,
     bossTimeMult: 1, spawnMult: 1,
@@ -1015,15 +1194,101 @@ function w2s(wx,wy) {
 }
 function shake(mag, dur=0.25) { G.shakeT = Math.max(G.shakeT, dur); G.shakeMag = Math.max(G.shakeMag, mag); }
 
+function resolveObstacleCollision(radius) {
+  if (!G.obstacles || G.obstacles.length === 0) return;
+  for (const o of G.obstacles) {
+    if (o.type === 'pillar') {
+      const dx = G.px - o.x, dy = G.py - o.y;
+      const d = Math.hypot(dx, dy) || 0.001;
+      const minD = o.r + radius;
+      if (d < minD) {
+        G.px = o.x + (dx/d) * minD;
+        G.py = o.y + (dy/d) * minD;
+      }
+    } else if (o.type === 'wall') {
+      // AABB: x±w/2, y±h/2
+      const halfW = o.w/2, halfH = o.h/2;
+      const px = G.px - o.x, py = G.py - o.y;
+      const cx = Math.max(-halfW, Math.min(halfW, px));
+      const cy = Math.max(-halfH, Math.min(halfH, py));
+      const dx = px - cx, dy = py - cy;
+      const d = Math.hypot(dx, dy);
+      if (d < radius) {
+        if (d < 0.01) {
+          // Inside the wall — push out along shortest axis
+          const exitX = halfW - Math.abs(px);
+          const exitY = halfH - Math.abs(py);
+          if (exitX < exitY) G.px = o.x + Math.sign(px||1)*(halfW+radius);
+          else G.py = o.y + Math.sign(py||1)*(halfH+radius);
+        } else {
+          const nx = dx/d, ny = dy/d;
+          G.px = o.x + cx + nx*radius;
+          G.py = o.y + cy + ny*radius;
+        }
+      }
+    }
+  }
+}
+
 function spawnEnemy(type) {
   const def = ENEMY_DEFS[type];
   const a = Math.random()*Math.PI*2;
-  const d = ARENA_R + 60;
+  const arenaR = G.arenaR || ARENA_R;
+  const d = arenaR + 60;
+  const hpMult  = (G.level && G.level.hpMult)  ? G.level.hpMult  : 1;
+  const hp = def.hp * hpMult;
   G.enemies.push({
     type, x:G.px+Math.cos(a)*d, y:G.py+Math.sin(a)*d,
-    hp:def.hp, maxHp:def.hp, flash:0,
+    hp, maxHp:hp, flash:0,
     shotTimer: rng(0, def.shotCd||9), lastDmg:0,
   });
+}
+
+function scheduleLevelBosses() {
+  if (!G.level || !G.level.boss) return;
+  // 'bombardiro' | 'bombardiro_mini' | 'bombardiro_plus' | 'ballerina' | 'capo' | 'all_three' | 'rotation'
+  const lvl = G.level;
+  if (lvl.boss === 'all_three') {
+    // Sequential spawns: at duration*0.4, *0.65, *0.9
+    const schedule = [
+      { id:'bombardiro', at:lvl.duration*0.40, key:'bombardiro' },
+      { id:'ballerina',  at:lvl.duration*0.65, key:'ballerina'  },
+      { id:'capo',       at:lvl.duration*0.90, key:'capo'       },
+    ];
+    for (const s of schedule) {
+      if (G.elapsed >= s.at && !G.bossesSpawned[s.key] && !G.boss) {
+        spawnBoss(s.id);
+      }
+    }
+    return;
+  }
+  if (lvl.boss === 'rotation') {
+    // Endless: cycle bosses every 90s
+    if (!G.boss) {
+      const cycle = Math.floor(G.elapsed / 90);
+      const order = ['bombardiro','ballerina','capo'];
+      const next = order[cycle % 3];
+      const nextAt = (cycle+1) * 90 - 90;  // first at 0, next at 90, etc
+      if (G.elapsed >= nextAt && (G._lastEndlessBossAt||-1) < cycle) {
+        G._lastEndlessBossAt = cycle;
+        G.bossesSpawned[next] = false; // re-enable
+        spawnBoss(next);
+      }
+    }
+    return;
+  }
+  // Single named boss
+  const bossKey = lvl.boss.replace('_mini','').replace('_plus','');
+  if (G.elapsed >= lvl.duration * 0.6 && !G.bossesSpawned[bossKey] && !G.boss) {
+    // Apply level-specific HP/dmg buffs via temporary override
+    const hpBoost  = lvl.boss === 'bombardiro_plus' ? 1.5 : 1;
+    const hpReduce = lvl.boss === 'bombardiro_mini' ? 0.5 : 1;
+    spawnBoss(bossKey);
+    if (G.boss) {
+      G.boss.hp    *= (hpBoost * hpReduce);
+      G.boss.maxHp *= (hpBoost * hpReduce);
+    }
+  }
 }
 
 function spawnBoss(id) {
@@ -1190,8 +1455,12 @@ function updatePlayer(dt) {
   if (mag>0) { dx/=mag; dy/=mag; G.faceX=dx; G.faceY=dy; }
   G.px += dx*G.pSpd*dt;
   G.py += dy*G.pSpd*dt;
+  // Arena clamp (per-level radius)
+  const arenaR = G.arenaR || ARENA_R;
   const pr=Math.hypot(G.px,G.py);
-  if (pr>ARENA_R-PLR_R) { const s=(ARENA_R-PLR_R)/pr; G.px*=s; G.py*=s; }
+  if (pr>arenaR-PLR_R) { const s=(arenaR-PLR_R)/pr; G.px*=s; G.py*=s; }
+  // Obstacle collision (push player out of pillars/walls)
+  resolveObstacleCollision(PLR_R);
 
   // Shield
   if (G.hasShield && !G.shieldUp) {
@@ -1432,16 +1701,18 @@ function updateMewingStrike(dt) {
 // ═══════════════════════════════════════════════════════════════════
 function updateEnemies(dt) {
   const snap = [...G.enemies];
+  const spdMult = (G.level && G.level.spdMult) ? G.level.spdMult : 1;
   for (const e of snap) {
     if (!G.enemies.includes(e)) continue;
     const def = ENEMY_DEFS[e.type];
+    const spd = def.spd * spdMult;
     if (e.flash > 0) e.flash -= dt;
     const dx = G.px-e.x, dy = G.py-e.y;
     const dist = Math.hypot(dx,dy) || 0.001;
 
     if (def.keepDist > 0) {
-      if (dist < def.keepDist) { e.x -= (dx/dist)*def.spd*dt; e.y -= (dy/dist)*def.spd*dt; }
-      else if (dist > def.keepDist+50) { e.x += (dx/dist)*def.spd*dt; e.y += (dy/dist)*def.spd*dt; }
+      if (dist < def.keepDist) { e.x -= (dx/dist)*spd*dt; e.y -= (dy/dist)*spd*dt; }
+      else if (dist > def.keepDist+50) { e.x += (dx/dist)*spd*dt; e.y += (dy/dist)*spd*dt; }
       e.shotTimer -= dt;
       if (e.shotTimer <= 0) {
         e.shotTimer = def.shotCd;
@@ -1449,7 +1720,7 @@ function updateEnemies(dt) {
         G.eProjecs.push({ x:e.x, y:e.y, vx:(dx/dist)*bs, vy:(dy/dist)*bs, life:3.5, dmg:def.dmg, color:'#4488ff' });
       }
     } else {
-      if (dist > PLR_R+def.r) { e.x += (dx/dist)*def.spd*dt; e.y += (dy/dist)*def.spd*dt; }
+      if (dist > PLR_R+def.r) { e.x += (dx/dist)*spd*dt; e.y += (dy/dist)*spd*dt; }
     }
 
     // Separation
@@ -1692,20 +1963,31 @@ function grantRandomPassive(rarity) {
 // SPAWNER + EVENTS
 // ═══════════════════════════════════════════════════════════════════
 function updateSpawner(dt) {
-  G.spawnRate = Math.min(12, Math.floor((1+Math.floor(G.elapsed/20)) * G.spawnMult));
+  // Per-level spawn rate boost
+  const lvlSpawnMult = (G.level && G.level.spawnMult) ? G.level.spawnMult : 1;
+  G.spawnRate = Math.min(14, Math.floor((1+Math.floor(G.elapsed/20)) * G.spawnMult * lvlSpawnMult));
   G.spawnCd   = 1.0/Math.max(1, G.spawnRate);
   G.wave      = Math.min(8, 1+Math.floor(G.elapsed/30));
   G.spawnTimer -= dt;
   if (G.spawnTimer <= 0) {
     G.spawnTimer = G.spawnCd;
-    spawnEnemy(weightedPick(typesForTime(G.elapsed)));
-  }
-  // Boss spawns (adjusted by bossTimeMult)
-  for (const id of Object.keys(BOSSES)) {
-    const adjustedTime = BOSSES[id].spawnAt * G.bossTimeMult;
-    if (G.elapsed >= adjustedTime && !G.bossesSpawned[id] && !G.boss) {
-      spawnBoss(id);
+    // Restrict to enemies allowed at this time AND in this level's pool
+    let avail = typesForTime(G.elapsed);
+    if (G.level && G.level.enemies) {
+      const pool = new Set(G.level.enemies);
+      avail = avail.filter(t => pool.has(t));
+      if (avail.length === 0) avail = G.level.enemies; // fallback
     }
+    spawnEnemy(weightedPick(avail));
+  }
+
+  // Per-level boss schedule (uses level.boss field)
+  scheduleLevelBosses();
+
+  // Win condition: survive the level duration
+  if (G.level && G.elapsed >= G.level.duration && !G.boss && !G.winState && G.alive) {
+    winLevel();
+    return;
   }
   // Vendor events
   if (!G.vendorActive && G.elapsed >= G.nextVendorAt) {
@@ -1796,13 +2078,15 @@ function drawShape(shape, x, y, r, fill, stroke) {
 // DRAW
 // ═══════════════════════════════════════════════════════════════════
 function draw() {
-  ctx.fillStyle = '#080a14';
+  const bgColor   = (G.level && G.level.bgColor)   ? G.level.bgColor   : '#080a14';
+  const gridColor = (G.level && G.level.gridColor) ? G.level.gridColor : 'rgba(36,54,96,0.32)';
+  ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Grid
   const ox = canvas.width/2 - G.camX + (G.shakeX||0);
   const oy = canvas.height/2 - G.camY + (G.shakeY||0);
-  ctx.strokeStyle = 'rgba(36,54,96,0.32)';
+  ctx.strokeStyle = gridColor;
   ctx.lineWidth = 1;
   const sx0 = Math.floor((-G.camX-canvas.width/2)/GRID_SIZE)*GRID_SIZE;
   const sx1 = Math.ceil((-G.camX+canvas.width/2)/GRID_SIZE)*GRID_SIZE;
@@ -1813,12 +2097,32 @@ function draw() {
   for(let gy=sy0;gy<=sy1;gy+=GRID_SIZE){ctx.moveTo(0,gy+oy);ctx.lineTo(canvas.width,gy+oy);}
   ctx.stroke();
 
-  // Arena boundary
+  // Arena boundary (per-level radius)
+  const arenaR = G.arenaR || ARENA_R;
   const ac = w2s(0,0);
-  ctx.beginPath(); ctx.arc(ac.x, ac.y, ARENA_R, 0, Math.PI*2);
+  ctx.beginPath(); ctx.arc(ac.x, ac.y, arenaR, 0, Math.PI*2);
   ctx.strokeStyle='rgba(48,168,255,0.22)'; ctx.lineWidth=28; ctx.stroke();
-  ctx.beginPath(); ctx.arc(ac.x, ac.y, ARENA_R, 0, Math.PI*2);
+  ctx.beginPath(); ctx.arc(ac.x, ac.y, arenaR, 0, Math.PI*2);
   ctx.strokeStyle='rgba(48,168,255,0.5)'; ctx.lineWidth=2; ctx.stroke();
+
+  // Obstacles
+  if (G.obstacles && G.obstacles.length) {
+    for (const o of G.obstacles) {
+      const s = w2s(o.x, o.y);
+      if (o.type === 'pillar') {
+        ctx.beginPath(); ctx.arc(s.x, s.y, o.r+8, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(80,90,120,0.25)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(s.x, s.y, o.r, 0, Math.PI*2);
+        ctx.fillStyle = '#3a4258'; ctx.fill();
+        ctx.strokeStyle = '#5a6a88'; ctx.lineWidth = 2; ctx.stroke();
+      } else if (o.type === 'wall') {
+        ctx.fillStyle = '#3a4258';
+        ctx.strokeStyle = '#5a6a88'; ctx.lineWidth = 2;
+        ctx.fillRect(s.x - o.w/2, s.y - o.h/2, o.w, o.h);
+        ctx.strokeRect(s.x - o.w/2, s.y - o.h/2, o.w, o.h);
+      }
+    }
+  }
 
   // Dash trail
   if (G.boss && BOSSES[G.boss.id].special === 'dash') {
@@ -2157,22 +2461,20 @@ function updateHUD() {
     bossBar.classList.remove('active');
   }
 
-  // Boss countdown
+  // Level/boss HUD
   const bcEl = document.getElementById('boss-countdown');
-  let nextBoss = null, nextTime = Infinity;
-  for (const id of Object.keys(BOSSES)) {
-    const t = BOSSES[id].spawnAt * G.bossTimeMult;
-    if (!G.bossesSpawned[id] && t < nextTime) { nextTime = t; nextBoss = id; }
-  }
   if (G.boss) {
-    bcEl.textContent = 'Boss active — FIGHT BACK';
+    bcEl.textContent = 'BOSS — ' + BOSSES[G.boss.id].name + ' — FIGHT BACK';
     bcEl.classList.add('urgent');
-  } else if (nextBoss) {
-    const remaining = Math.max(0, nextTime - G.elapsed);
-    bcEl.textContent = 'Next boss in ' + fmt(remaining) + ' — ' + BOSSES[nextBoss].name;
+  } else if (G.level && G.level.id === 8) {
+    bcEl.textContent = 'ENDLESS — Survived ' + fmt(G.elapsed) + ' — Press on, bozo';
+    bcEl.classList.remove('urgent');
+  } else if (G.level) {
+    const remaining = Math.max(0, G.level.duration - G.elapsed);
+    bcEl.textContent = 'Level ' + G.level.id + ' — ' + fmt(remaining) + ' to clear';
     if (remaining < 15) bcEl.classList.add('urgent'); else bcEl.classList.remove('urgent');
   } else {
-    bcEl.textContent = 'All bosses cleared. Survive endlessly, bozo.';
+    bcEl.textContent = '';
     bcEl.classList.remove('urgent');
   }
 
@@ -2493,19 +2795,12 @@ function showChestModal() {
 // ═══════════════════════════════════════════════════════════════════
 function die() {
   G.alive = false;
-  document.getElementById('ds-kills').textContent = G.kills;
-  document.getElementById('ds-time').textContent = fmt(G.elapsed);
-  document.getElementById('ds-level').textContent = G.level;
-  document.getElementById('ds-wave').textContent = G.wave;
-  document.getElementById('ds-bosses').textContent = G.bossKills;
-  document.getElementById('ds-coins').textContent = G.coins;
-  document.getElementById('death-modal').classList.add('active');
+  loseRun();
 }
 
 document.getElementById('restart-btn').addEventListener('click', () => {
   document.getElementById('death-modal').classList.remove('active');
-  G = mkGame();
-  showGacha();
+  gotoLobby();
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2561,6 +2856,257 @@ function applyClass(id) {
   if (m.coinsStart)   G.coins += m.coinsStart;
   checkEvolutions();
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// META SHOP (persistent, lobby-only)
+// ═══════════════════════════════════════════════════════════════════
+const META_SHOP = {
+  hp:       { name:'Big Brain',       desc:'+5 max HP per tier.',          baseCost:30, growth:1.4, max:10,
+              apply:(G,t)=>{G.pMaxHp+=5*t; G.pHp+=5*t;} },
+  speed:    { name:'Sigma Stride',    desc:'+3% move speed per tier.',     baseCost:40, growth:1.4, max:10,
+              apply:(G,t)=>{G.pSpd*=Math.pow(1.03,t);} },
+  dmg:      { name:'Glaze Multiplier',desc:'+3% damage per tier.',         baseCost:50, growth:1.5, max:10,
+              apply:(G,t)=>{G.dmgMult*=Math.pow(1.03,t);} },
+  crit:     { name:'Bussin Edge',     desc:'+2% crit chance per tier.',    baseCost:60, growth:1.5, max:10,
+              apply:(G,t)=>{G.wCrit=Math.min(0.95,G.wCrit+0.02*t);} },
+  xp:       { name:'Grindset Sage',   desc:'+5% XP gain per tier.',        baseCost:40, growth:1.4, max:10,
+              apply:(G,t)=>{G.xpMult*=Math.pow(1.05,t);} },
+  coins:    { name:'Tax Collector',   desc:'+10% coin gain per tier.',     baseCost:50, growth:1.4, max:10,
+              apply:(G,t)=>{G.coinMult=(G.coinMult||1)*Math.pow(1.1,t);} },
+  startCoins:{name:'Starting Bag',    desc:'Start each run with +20 Fanum Tax per tier.', baseCost:35, growth:1.3, max:8,
+              apply:(G,t)=>{G.coins+=20*t;} },
+  reroll:   { name:'Free Re-Roll',    desc:'1 free gacha re-roll per run per tier.', baseCost:120, growth:2.0, max:5,
+              apply:(G,t)=>{G.freeRerolls=(G.freeRerolls||0)+t;} },
+};
+
+function applyMetaShop(G) {
+  for (const [id, def] of Object.entries(META_SHOP)) {
+    const t = PROGRESS.shopTiers[id] || 0;
+    if (t > 0) def.apply(G, t);
+  }
+}
+
+function metaCost(id) {
+  const t = PROGRESS.shopTiers[id] || 0;
+  return Math.round(META_SHOP[id].baseCost * Math.pow(META_SHOP[id].growth, t));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════
+let CURRENT_SCREEN = 'lobby';  // 'lobby' | 'levelselect' | 'metashop' | 'collection' | 'gacha' | 'run' | 'results'
+
+function hideAllOverlays() {
+  ['lobby-screen','levelselect-screen','metashop-screen','collection-screen','results-screen','gacha-modal'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+}
+
+function gotoLobby() {
+  CURRENT_SCREEN = 'lobby';
+  hideAllOverlays();
+  G.paused = true;
+  G.alive = false;  // ensure game logic doesn't run
+  renderLobby();
+  document.getElementById('lobby-screen').classList.add('active');
+}
+
+function renderLobby() {
+  document.getElementById('lobby-braincells').textContent = PROGRESS.braincells.toLocaleString();
+  document.getElementById('lobby-runs').textContent = PROGRESS.totalRuns;
+  document.getElementById('lobby-kills').textContent = PROGRESS.totalKills.toLocaleString();
+  document.getElementById('lobby-highest').textContent = PROGRESS.highestLevel;
+}
+
+// Level select
+function gotoLevelSelect() {
+  CURRENT_SCREEN = 'levelselect';
+  hideAllOverlays();
+  renderLevelSelect();
+  document.getElementById('levelselect-screen').classList.add('active');
+}
+
+function renderLevelSelect() {
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = '';
+  for (const id of Object.keys(LEVELS)) {
+    const lvl = LEVELS[id];
+    const locked = parseInt(id) > PROGRESS.highestLevel;
+    const cleared = !!(PROGRESS.levelBests[id] && PROGRESS.levelBests[id].won);
+    const card = document.createElement('div');
+    card.className = 'level-card' + (locked ? ' locked' : '') + (cleared ? ' cleared' : '');
+    if (locked) {
+      card.innerHTML = `<div class="level-num">LEVEL ${id}</div><div class="level-lock">🔒</div><div class="level-name">Locked</div><div class="level-desc">Beat Level ${parseInt(id)-1} to unlock.</div>`;
+    } else {
+      const best = PROGRESS.levelBests[id];
+      card.innerHTML = `<div class="level-num">LEVEL ${id}${cleared?' ✓':''}</div><div class="level-name">${lvl.name}</div><div class="level-desc">${lvl.desc}</div>${best ? `<div class="level-best">Best: ${fmt(best.time)} • ${best.kills} kills</div>` : ''}`;
+      card.addEventListener('click', () => startRun(parseInt(id)));
+    }
+    grid.appendChild(card);
+  }
+}
+
+// Meta shop
+function gotoMetaShop() {
+  CURRENT_SCREEN = 'metashop';
+  hideAllOverlays();
+  renderMetaShop();
+  document.getElementById('metashop-screen').classList.add('active');
+}
+
+function renderMetaShop() {
+  document.getElementById('metashop-balance').textContent = 'Braincells: ' + PROGRESS.braincells.toLocaleString();
+  const row = document.getElementById('metashop-row');
+  row.innerHTML = '';
+  for (const id of Object.keys(META_SHOP)) {
+    const def = META_SHOP[id];
+    const tier = PROGRESS.shopTiers[id] || 0;
+    const maxed = tier >= def.max;
+    const cost = metaCost(id);
+    const can = !maxed && PROGRESS.braincells >= cost;
+    const item = document.createElement('div');
+    item.className = 'meta-item' + (maxed ? ' maxed' : '');
+    item.innerHTML = `
+      <div class="meta-info"><div class="meta-name">${def.name}</div><div class="meta-desc">${def.desc}</div></div>
+      <div class="meta-level ${maxed?'maxed':''}">${maxed ? 'MAXED' : 'Lv ' + tier + '/' + def.max}</div>
+      <button class="meta-buy" ${can?'':'disabled'}>${maxed ? '—' : cost + ' BC'}</button>
+    `;
+    if (can) {
+      item.querySelector('.meta-buy').addEventListener('click', () => {
+        PROGRESS.braincells -= cost;
+        PROGRESS.shopTiers[id] = tier + 1;
+        saveProgress();
+        renderMetaShop();
+      });
+    }
+    row.appendChild(item);
+  }
+}
+
+// Collection
+function gotoCollection() {
+  CURRENT_SCREEN = 'collection';
+  hideAllOverlays();
+  renderCollection();
+  document.getElementById('collection-screen').classList.add('active');
+}
+
+function renderCollection() {
+  const grid = document.getElementById('collection-grid');
+  grid.innerHTML = '';
+  const ids = Object.keys(CLASSES);
+  let collected = 0;
+  for (const cid of ids) {
+    const c = CLASSES[cid];
+    const r = RARITY_INFO[c.rarity];
+    const count = PROGRESS.classesRolled[cid] || 0;
+    if (count > 0) collected++;
+    const sprite = CLASS_SPRITES[cid] || [0,0];
+    const pos = sheetPos(sprite);
+    const card = document.createElement('div');
+    card.className = 'coll-card' + (count === 0 ? ' locked' : '');
+    card.innerHTML = `
+      <div class="coll-portrait" style="background-image:url('${ASSET_PATHS.classes}');background-position:${pos}"></div>
+      <div class="coll-name">${count === 0 ? '???' : c.name}</div>
+      <div class="coll-rarity" style="color:${r.color}">${r.label}</div>
+      <div class="coll-count">${count > 0 ? 'Rolled ×' + count : 'Not yet rolled'}</div>
+    `;
+    grid.appendChild(card);
+  }
+  document.getElementById('collection-progress').textContent = `${collected} / ${ids.length} Collected`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RUN START / END
+// ═══════════════════════════════════════════════════════════════════
+function startRun(levelId) {
+  hideAllOverlays();
+  G = mkGame(levelId);
+  G.alive = true;
+  G.paused = true;
+  CURRENT_SCREEN = 'gacha';
+  PROGRESS.totalRuns++;
+  saveProgress();
+  showGacha();
+}
+
+function winLevel() {
+  if (G.winState) return;
+  G.winState = 'won';
+  G.elapsedAtWin = G.elapsed;
+  // Save best
+  const id = G.levelId;
+  const prev = PROGRESS.levelBests[id];
+  const time = G.elapsed;
+  if (!prev || !prev.won || time < prev.time) {
+    PROGRESS.levelBests[id] = { time, kills:G.kills, won:true };
+  }
+  // Unlock next level
+  if (id < 8 && PROGRESS.highestLevel < id + 1) {
+    PROGRESS.highestLevel = id + 1;
+  }
+  // Award Braincells (level number ×100 + kill bonus)
+  const reward = id * 100 + Math.floor(G.kills * 2);
+  PROGRESS.braincells += reward;
+  PROGRESS.totalKills += G.kills;
+  saveProgress();
+  showResults(true, reward);
+}
+
+function loseRun() {
+  if (G.winState) return;
+  G.winState = 'lost';
+  PROGRESS.totalDeaths++;
+  PROGRESS.totalKills += G.kills;
+  // Smaller braincell reward on death (still feel rewarded)
+  const reward = Math.floor(G.kills * 1.5 + G.elapsed * 0.5);
+  PROGRESS.braincells += reward;
+  saveProgress();
+  showResults(false, reward);
+}
+
+function showResults(won, reward) {
+  CURRENT_SCREEN = 'results';
+  G.paused = true;
+  G.alive = false;
+  hideAllOverlays();
+  const t = document.getElementById('results-title');
+  t.textContent = won ? 'LEVEL CLEAR' : 'RATIO\'D';
+  t.className = won ? 'win' : 'loss';
+  const lvl = G.level;
+  document.getElementById('results-sub').textContent = `${lvl.name} — Level ${lvl.id}`;
+  const c = CLASSES[G.classId] || { name:'—' };
+  const stats = document.getElementById('results-stats');
+  stats.innerHTML = `
+    <div class="rs-row"><div class="rs-val">${G.kills}</div><div class="rs-label">Kills</div></div>
+    <div class="rs-row"><div class="rs-val">${fmt(G.elapsed)}</div><div class="rs-label">Time</div></div>
+    <div class="rs-row"><div class="rs-val">${G.level||1}</div><div class="rs-label">Lv reached</div></div>
+    <div class="rs-row"><div class="rs-val">${G.bossKills}</div><div class="rs-label">Bosses</div></div>
+    <div class="rs-row"><div class="rs-val">${G.coins}</div><div class="rs-label">Fanum Tax</div></div>
+    <div class="rs-row"><div class="rs-val">${c.name}</div><div class="rs-label">Class</div></div>
+  `;
+  document.getElementById('results-reward').textContent = '+' + reward + ' BRAINCELLS';
+  // Show NEXT button only on win + not last level
+  const nextBtn = document.getElementById('results-next-btn');
+  nextBtn.style.display = (won && G.levelId < 8) ? '' : 'none';
+  document.getElementById('results-screen').classList.add('active');
+}
+
+// Lobby button handlers
+document.getElementById('lobby-play-btn').addEventListener('click', gotoLevelSelect);
+document.getElementById('lobby-shop-btn').addEventListener('click', gotoMetaShop);
+document.getElementById('lobby-collection-btn').addEventListener('click', gotoCollection);
+document.getElementById('lobby-wipe-btn').addEventListener('click', () => {
+  if (confirm('Wipe ALL progress? This cannot be undone.')) {
+    wipeProgress(); renderLobby();
+  }
+});
+document.getElementById('levelselect-back-btn').addEventListener('click', gotoLobby);
+document.getElementById('metashop-back-btn').addEventListener('click', gotoLobby);
+document.getElementById('collection-back-btn').addEventListener('click', gotoLobby);
+document.getElementById('results-lobby-btn').addEventListener('click', gotoLobby);
+document.getElementById('results-retry-btn').addEventListener('click', () => startRun(G.levelId));
+document.getElementById('results-next-btn').addEventListener('click', () => startRun(G.levelId + 1));
 
 function renderGachaCard(id) {
   const c = CLASSES[id];
@@ -2643,7 +3189,12 @@ document.getElementById('gacha-roll-btn').addEventListener('click', () => {
 document.getElementById('gacha-confirm-btn').addEventListener('click', () => {
   if (!_rolledClassId) return;
   applyClass(_rolledClassId);
+  applyMetaShop(G);
+  // Track this roll in PROGRESS
+  PROGRESS.classesRolled[_rolledClassId] = (PROGRESS.classesRolled[_rolledClassId] || 0) + 1;
+  saveProgress();
   document.getElementById('gacha-modal').classList.remove('active');
+  CURRENT_SCREEN = 'run';
   G.paused = false;
   lastT = performance.now();
 });
@@ -3006,9 +3557,12 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
-G = mkGame();
+// Initial state — start at lobby, no live run
+G = mkGame(1);
+G.alive = false;
+G.paused = true;
 lastT = performance.now();
-showGacha();
+gotoLobby();
 requestAnimationFrame(loop);
 </script>
 </body>
