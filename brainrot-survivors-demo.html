@@ -1376,7 +1376,7 @@ function mkGame(levelId = 1) {
   return {
     // Level config
     levelId,
-    level: lvl,
+    stage: lvl,
     arenaR: getArenaRadiusForLevel(lvl),
     obstacles,
     winState: null,  // null, 'won', 'lost'
@@ -1503,7 +1503,7 @@ function spawnEnemy(type) {
   const a = Math.random()*Math.PI*2;
   const arenaR = G.arenaR || ARENA_R;
   const d = arenaR + 60;
-  const hpMult  = (G.level && G.level.hpMult)  ? G.level.hpMult  : 1;
+  const hpMult  = (G.stage && G.stage.hpMult)  ? G.stage.hpMult  : 1;
   const hp = def.hp * hpMult;
   G.enemies.push({
     type, x:G.px+Math.cos(a)*d, y:G.py+Math.sin(a)*d,
@@ -1513,9 +1513,9 @@ function spawnEnemy(type) {
 }
 
 function scheduleLevelBosses() {
-  if (!G.level || !G.level.boss) return;
+  if (!G.stage || !G.stage.boss) return;
   // 'bombardiro' | 'bombardiro_mini' | 'bombardiro_plus' | 'ballerina' | 'capo' | 'all_three' | 'rotation'
-  const lvl = G.level;
+  const lvl = G.stage;
   if (lvl.boss === 'all_three') {
     // Sequential spawns: at duration*0.4, *0.65, *0.9
     const schedule = [
@@ -1992,7 +1992,7 @@ function updateMewingStrike(dt) {
 // ═══════════════════════════════════════════════════════════════════
 function updateEnemies(dt) {
   const snap = [...G.enemies];
-  const spdMult = (G.level && G.level.spdMult) ? G.level.spdMult : 1;
+  const spdMult = (G.stage && G.stage.spdMult) ? G.stage.spdMult : 1;
   for (const e of snap) {
     if (!G.enemies.includes(e)) continue;
     const def = ENEMY_DEFS[e.type];
@@ -2267,8 +2267,8 @@ function grantRandomPassive(rarity) {
 function updateSpawner(dt) {
   // Softer ramp (every 25s instead of 20s) + per-level spawn cap so early
   // levels never get screen-flooded. Level 1 caps at 4/sec for fair tutorial.
-  const lvlSpawnMult = (G.level && G.level.spawnMult) ? G.level.spawnMult : 1;
-  const lvlCap = (G.level && G.level.maxSpawn) ? G.level.maxSpawn : 14;
+  const lvlSpawnMult = (G.stage && G.stage.spawnMult) ? G.stage.spawnMult : 1;
+  const lvlCap = (G.stage && G.stage.maxSpawn) ? G.stage.maxSpawn : 14;
   const ramp = 1 + Math.floor(G.elapsed / 25);
   G.spawnRate = Math.min(lvlCap, Math.floor(ramp * G.spawnMult * lvlSpawnMult));
   G.spawnCd   = 1.0/Math.max(1, G.spawnRate);
@@ -2278,10 +2278,10 @@ function updateSpawner(dt) {
     G.spawnTimer = G.spawnCd;
     // Restrict to enemies allowed at this time AND in this level's pool
     let avail = typesForTime(G.elapsed);
-    if (G.level && G.level.enemies) {
-      const pool = new Set(G.level.enemies);
+    if (G.stage && G.stage.enemies) {
+      const pool = new Set(G.stage.enemies);
       avail = avail.filter(t => pool.has(t));
-      if (avail.length === 0) avail = G.level.enemies; // fallback
+      if (avail.length === 0) avail = G.stage.enemies; // fallback
     }
     spawnEnemy(weightedPick(avail));
   }
@@ -2290,7 +2290,7 @@ function updateSpawner(dt) {
   scheduleLevelBosses();
 
   // Win condition: survive the level duration
-  if (G.level && G.elapsed >= G.level.duration && !G.boss && !G.winState && G.alive) {
+  if (G.stage && G.elapsed >= G.stage.duration && !G.boss && !G.winState && G.alive) {
     winLevel();
     return;
   }
@@ -2389,8 +2389,8 @@ function drawShape(shape, x, y, r, fill, stroke) {
 // DRAW
 // ═══════════════════════════════════════════════════════════════════
 function draw() {
-  const bgColor   = (G.level && G.level.bgColor)   ? G.level.bgColor   : '#080a14';
-  const gridColor = (G.level && G.level.gridColor) ? G.level.gridColor : 'rgba(36,54,96,0.32)';
+  const bgColor   = (G.stage && G.stage.bgColor)   ? G.stage.bgColor   : '#080a14';
+  const gridColor = (G.stage && G.stage.gridColor) ? G.stage.gridColor : 'rgba(36,54,96,0.32)';
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -2791,12 +2791,12 @@ function updateHUD() {
   if (G.boss) {
     bcEl.textContent = 'BOSS — ' + BOSSES[G.boss.id].name + ' — FIGHT BACK';
     bcEl.classList.add('urgent');
-  } else if (G.level && G.level.id === 8) {
+  } else if (G.stage && G.stage.id === 8) {
     bcEl.textContent = 'ENDLESS — Survived ' + fmt(G.elapsed) + ' — Press on, bozo';
     bcEl.classList.remove('urgent');
-  } else if (G.level) {
-    const remaining = Math.max(0, G.level.duration - G.elapsed);
-    bcEl.textContent = 'Level ' + G.level.id + ' — ' + fmt(remaining) + ' to clear';
+  } else if (G.stage) {
+    const remaining = Math.max(0, G.stage.duration - G.elapsed);
+    bcEl.textContent = 'Level ' + G.stage.id + ' — ' + fmt(remaining) + ' to clear';
     if (remaining < 15) bcEl.classList.add('urgent'); else bcEl.classList.remove('urgent');
   } else {
     bcEl.textContent = '';
@@ -3424,7 +3424,7 @@ function showResults(won, reward) {
   const t = document.getElementById('results-title');
   t.textContent = won ? 'LEVEL CLEAR' : 'RATIO\'D';
   t.className = won ? 'win' : 'loss';
-  const lvl = G.level;
+  const lvl = G.stage || LEVELS[G.levelId] || LEVELS[1];
   document.getElementById('results-sub').textContent = `${lvl.name} — Level ${lvl.id}`;
   const c = CLASSES[G.classId] || { name:'—' };
   const stats = document.getElementById('results-stats');
