@@ -997,7 +997,9 @@ const MAX_WEAPONS = 4;
 const MAX_PASSIVES = 5;
 const COMBO_TIMEOUT = 3.0;
 
-const XP_THRESHOLDS = [50, 110, 190, 290, 410, 560, 740, 950, 1190, 1460, 1760, 2090, 2450, 2840, 3260];
+// Lowered early thresholds so the first level-up lands around 15-25s on L1
+// and the build starts forming inside the first minute.
+const XP_THRESHOLDS = [30, 75, 140, 220, 320, 440, 580, 740, 920, 1130, 1380, 1680, 2020, 2400, 2820];
 
 // ═══════════════════════════════════════════════════════════════════
 // PERSISTENT PROGRESS (localStorage)
@@ -1044,42 +1046,42 @@ function wipeProgress() {
 // ═══════════════════════════════════════════════════════════════════
 const LEVELS = {
   1: { id:1, name:'The Comments Section', theme:'comments',
-       duration:120, enemies:['runner'], boss:null,
-       hpMult:1.0, spdMult:1.0, spawnMult:1.0,
+       duration:120, enemies:['runner'], boss:null, maxSpawn:4,
+       hpMult:1.0, spdMult:0.92, spawnMult:1.0,
        obstacles:[], bgColor:'#080a14', gridColor:'rgba(36,54,96,0.32)',
        desc:'Tutorial. Just runners. Get a feel for the chat.' },
   2: { id:2, name:'Sigma Streets', theme:'streets',
-       duration:180, enemies:['runner','fast'], boss:'bombardiro_mini',
-       hpMult:1.15, spdMult:1.05, spawnMult:1.15,
+       duration:180, enemies:['runner','fast'], boss:'bombardiro_mini', maxSpawn:6,
+       hpMult:1.10, spdMult:1.00, spawnMult:1.10,
        obstacles:'narrow', bgColor:'#0a1218', gridColor:'rgba(70,90,130,0.32)',
        desc:'Faster enemies. Tighter arena. Watch your spacing.' },
   3: { id:3, name:'The Rizz Pit', theme:'rizz',
-       duration:240, enemies:['runner','fast','tank'], boss:'bombardiro',
-       hpMult:1.3, spdMult:1.10, spawnMult:1.3,
+       duration:240, enemies:['runner','fast','tank'], boss:'bombardiro', maxSpawn:8,
+       hpMult:1.25, spdMult:1.07, spawnMult:1.25,
        obstacles:'pillars', bgColor:'#180a14', gridColor:'rgba(140,60,90,0.32)',
        desc:'Pillars block your shots. First real boss: Bombardiro Grande.' },
   4: { id:4, name:'Ohio Wastes', theme:'ohio',
-       duration:300, enemies:['runner','fast','tank','ranged'], boss:'bombardiro_plus',
-       hpMult:1.5, spdMult:1.15, spawnMult:1.5,
+       duration:300, enemies:['runner','fast','tank','ranged'], boss:'bombardiro_plus', maxSpawn:10,
+       hpMult:1.45, spdMult:1.12, spawnMult:1.4,
        obstacles:'pillars', bgColor:'#1a0e08', gridColor:'rgba(180,90,40,0.32)',
        desc:'Ranged enemies shoot from afar. The wastes are unforgiving.' },
   5: { id:5, name:'Skibidi Tower', theme:'skibidi',
-       duration:360, enemies:['runner','fast','tank','exploder'], boss:'ballerina',
-       hpMult:1.7, spdMult:1.20, spawnMult:1.7,
+       duration:360, enemies:['runner','fast','tank','exploder'], boss:'ballerina', maxSpawn:12,
+       hpMult:1.65, spdMult:1.18, spawnMult:1.6,
        obstacles:'walls', bgColor:'#0e1820', gridColor:'rgba(80,120,180,0.32)',
        desc:'Walls split the arena. Ballerina spawns clones. Stay mobile.' },
   6: { id:6, name:'Cosmic Coliseum', theme:'cosmic',
-       duration:420, enemies:['runner','fast','tank','ranged','exploder'], boss:'capo',
-       hpMult:2.0, spdMult:1.25, spawnMult:2.0,
+       duration:420, enemies:['runner','fast','tank','ranged','exploder'], boss:'capo', maxSpawn:13,
+       hpMult:1.9, spdMult:1.22, spawnMult:1.8,
        obstacles:'walls', bgColor:'#140a20', gridColor:'rgba(120,80,200,0.32)',
        desc:'All enemy types. Il Capo Crocodilo rules this arena. The glaze peaks here.' },
   7: { id:7, name:'Brainrot Apocalypse', theme:'apocalypse',
-       duration:600, enemies:['runner','fast','tank','ranged','exploder'], boss:'all_three',
-       hpMult:2.4, spdMult:1.30, spawnMult:2.4,
+       duration:600, enemies:['runner','fast','tank','ranged','exploder'], boss:'all_three', maxSpawn:14,
+       hpMult:2.2, spdMult:1.28, spawnMult:2.1,
        obstacles:'maze', bgColor:'#1a0612', gridColor:'rgba(200,60,80,0.32)',
        desc:'All 3 bosses spawn sequentially. The maze restricts movement. Final test.' },
   8: { id:8, name:'Endless Brainrot', theme:'endless',
-       duration:99999, enemies:['runner','fast','tank','ranged','exploder'], boss:'rotation',
+       duration:99999, enemies:['runner','fast','tank','ranged','exploder'], boss:'rotation', maxSpawn:14,
        hpMult:2.0, spdMult:1.2, spawnMult:2.0,  // grows over time
        obstacles:'rotate', bgColor:'#0a0612', gridColor:'rgba(160,80,200,0.32)',
        desc:'No end. Difficulty scales every 60s. How far can you go?' },
@@ -1155,31 +1157,36 @@ const WEAPONS = {
     name:'Comment Cannon', color:'#00ffee', maxLvl:5,
     desc:l => l===0?'Auto-fires a piercing comment at the nearest enemy. Mid? No, bussin.'
                   :`Lv ${l+1}: +15 dmg, faster cooldown. Stay glazed.`,
-    stats:l => ({ dmg:50+l*15, cd:Math.max(0.6,1-l*0.1), range:l>=2?340:290 }),
+    // ~55 DPS baseline single-target. Reliable backbone.
+    stats:l => ({ dmg:55+l*15, cd:Math.max(0.55,1-l*0.1), range:l>=2?340:290 }),
   },
   glazer_beads: {
     name:'Glazer Beads', color:'#ff6abf', maxLvl:5,
     desc:l => l===0?'Pink orbs orbit you forever. Mid enemies? Absolutely cooked.'
-                  :`Lv ${l+1}: +1 orb, +10 dmg. Now perfectly balanced.`,
-    stats:l => ({ dmg:25+l*10, count:3+l, hitCd:0.5, orbitR:80, orbitSpd:1.5+l*0.2 }),
+                  :`Lv ${l+1}: +1 orb, +12 dmg. Now perfectly balanced.`,
+    // Tuned up: stronger per-hit + faster re-hit so it competes with sweep/strike.
+    stats:l => ({ dmg:32+l*12, count:3+l, hitCd:0.42, orbitR:80, orbitSpd:1.5+l*0.2 }),
   },
   sigma_sweep: {
     name:'Sigma Sweep', color:'#ffcc20', maxLvl:5,
     desc:l => l===0?'A gold arc rotates around you. Doesn\'t care about you. Alpha aura.'
-                  :`Lv ${l+1}: +15 dmg, longer reach.`,
-    stats:l => ({ dmg:20+l*15, tickCd:0.2, length:150+l*30, arc:(45+l*10)*Math.PI/180, rotSpd:1.2+l*0.25 }),
+                  :`Lv ${l+1}: +12 dmg, longer reach.`,
+    // Reduced from 20 baseline — was clearly best-in-slot for sustained AoE.
+    stats:l => ({ dmg:14+l*12, tickCd:0.22, length:150+l*30, arc:(45+l*10)*Math.PI/180, rotSpd:1.1+l*0.22 }),
   },
   ohio_drop: {
     name:'Ohio Drop', color:'#ff8822', maxLvl:5,
     desc:l => l===0?'Drop cursed packages every couple seconds. Something wrong in there.'
                   :`Lv ${l+1}: faster drops, bigger blast.`,
-    stats:l => ({ dmg:80+l*30, dropCd:Math.max(0.75,2-l*0.25), radius:100+l*25, fuse:1.8 }),
+    // Slightly faster fuse so burst feels responsive.
+    stats:l => ({ dmg:80+l*30, dropCd:Math.max(0.7,2-l*0.27), radius:100+l*25, fuse:1.5 }),
   },
   mewing_strike: {
     name:'Mewing Strike', color:'#ffffff', maxLvl:5,
     desc:l => l===0?'A clean swipe in your facing. Silent. Looksmaxxed.'
-                  :`Lv ${l+1}: +25 dmg, wider arc.`,
-    stats:l => ({ dmg:60+l*25, cd:Math.max(0.25,0.5-l*0.05), arc:(120+l*15)*Math.PI/180, range:100 }),
+                  :`Lv ${l+1}: +20 dmg, wider arc.`,
+    // Reduced from 60 — melee was clearly top single-direction DPS.
+    stats:l => ({ dmg:45+l*20, cd:Math.max(0.28,0.5-l*0.05), arc:(120+l*15)*Math.PI/180, range:100 }),
   },
 };
 
@@ -1422,7 +1429,8 @@ function mkGame(levelId = 1) {
     coinDrops:[], particles:[], dmgNums:[], chests:[],
 
     // Spawner
-    spawnTimer:0, spawnCd:1, spawnRate:1,
+    // 3s grace period before first enemy spawns — player learns controls/weapon
+    spawnTimer:3, spawnCd:1, spawnRate:1,
 
     // Camera + screen shake
     camX:0, camY:0, shakeT:0, shakeMag:0, shakeX:0, shakeY:0,
@@ -2257,9 +2265,12 @@ function grantRandomPassive(rarity) {
 // SPAWNER + EVENTS
 // ═══════════════════════════════════════════════════════════════════
 function updateSpawner(dt) {
-  // Per-level spawn rate boost
+  // Softer ramp (every 25s instead of 20s) + per-level spawn cap so early
+  // levels never get screen-flooded. Level 1 caps at 4/sec for fair tutorial.
   const lvlSpawnMult = (G.level && G.level.spawnMult) ? G.level.spawnMult : 1;
-  G.spawnRate = Math.min(14, Math.floor((1+Math.floor(G.elapsed/20)) * G.spawnMult * lvlSpawnMult));
+  const lvlCap = (G.level && G.level.maxSpawn) ? G.level.maxSpawn : 14;
+  const ramp = 1 + Math.floor(G.elapsed / 25);
+  G.spawnRate = Math.min(lvlCap, Math.floor(ramp * G.spawnMult * lvlSpawnMult));
   G.spawnCd   = 1.0/Math.max(1, G.spawnRate);
   G.wave      = Math.min(8, 1+Math.floor(G.elapsed/30));
   G.spawnTimer -= dt;
